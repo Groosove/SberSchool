@@ -5,7 +5,7 @@ import Foundation
 ** Релизовать COW
 */
 
-final class Refer<T> {
+private final class Refer<T> {
 	var value: T
 	init (_ value: T) {
 		self.value = value
@@ -13,7 +13,7 @@ final class Refer<T> {
 }
 
 struct Box<T> {
-	var ref: Refer<T>
+	private var ref: Refer<T>
 	
 	init (_ value: T) {
 		self.ref = Refer(value)
@@ -23,20 +23,20 @@ struct Box<T> {
 		set {
 			if !isKnownUniquelyReferenced(&ref) {
 				ref = Refer(newValue)
+				return
 			}
-			else {
-				ref.value = newValue
-			}
+			ref.value = newValue
 		}
 	}
+	mutating func refAddress() { print(Unmanaged.passUnretained(ref).toOpaque()) }
 }
 
 var a = Box(5)
 var b = a
 
-print(Unmanaged.passUnretained(a.ref).toOpaque())
-print(Unmanaged.passUnretained(b.ref).toOpaque())
+a.refAddress()
+b.refAddress()
 b.value = 20
 print("")
-print(Unmanaged.passUnretained(a.ref).toOpaque())
-print(Unmanaged.passUnretained(b.ref).toOpaque())
+a.refAddress()
+b.refAddress()
