@@ -2,32 +2,47 @@ import Foundation
 import PlaygroundSupport
 PlaygroundPage.current.needsIndefiniteExecution = true
 
-protocol Sayble {
-	func say()
-}
+/*
+** Task-1
+** Реализовать все виды диспетчеризации
+*/
 
-extension Sayble {
-	func say() {
-		print("Sayble.say()")
+//MARK: Direct Dispatch
+struct SomeStruct {
+	func sayHello(name: String = "Anonymous") {
+		print("Hello, \(name)");
 	}
 }
+var structObj = SomeStruct()
+structObj.sayHello()
 
-class Human: Sayble {
-	func say() {
-		print("Human.say()")
-	}
+//MARK: Witness Dispatch
+protocol SomeProtocol {
+	func sayHello(name: String)
 }
 
-class Animal {}
-
-extension Animal: Sayble {
-	func say() {
-		print("Animal.say()")
+struct NewStruct: SomeProtocol {
+	func sayHello(name: String = "Anonymous") {
+		print("Hello, \(name)");
 	}
 }
+var newStructObj = NewStruct()
+newStructObj.sayHello(name: "Nikita")
 
-let human: Sayble = Human()
-let animal: Sayble = Animal()
+//MARK: Virtual Dispatch
+class SomeClass {
+	func sayHello(name: String = "Anonymous") {
+		print("Hello, \(name)");
+	}
+}
+var classObj = SomeClass()
+classObj.sayHello(name: "Ivan")
 
-human.say()
-animal.say()
+//MARK: Message Dispatch
+class ObjClass {
+	@objc dynamic func sayHello(name: String = "Anonymous") {
+		print("Hello, \(name)");
+	}
+}
+var objClass = ObjClass()
+objClass.sayHello()
