@@ -10,3 +10,5 @@
     + Реализовать свой Copy on write со свойством reference type
 3. Коллекции, Closures
     + Описать различие Objective-c блоков от Swift closure
+4. Работа со строками. 
+    + Реализовать виды диспетчеризации в Swift
