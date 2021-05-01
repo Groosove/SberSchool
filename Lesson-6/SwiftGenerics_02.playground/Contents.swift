@@ -7,6 +7,7 @@ protocol Container {
 	mutating func push(_ item: Item)
 	subscript(i: Int) -> Item? { get }
 	mutating func pop() -> Item?
+	func top() -> Item?
 }
 
 struct LinkedList<Element>: Container {
@@ -14,9 +15,7 @@ struct LinkedList<Element>: Container {
 		var value: Element
 		var next: Node?
 		
-		init (_ value: Element) {
-			self.value = value
-		}
+		init (_ value: Element) { self.value = value }
 	}
 	private var count: Int = 0
 	private var head: Node? = nil
@@ -50,7 +49,9 @@ struct LinkedList<Element>: Container {
 		}
 		count += 1
 	}
-	
+	func top() -> Item? {
+		return (head == nil) ? nil : head?.value
+	}
 	mutating func pop() -> Element? {
 		if let tmpNode = head {
 			head = head?.next
@@ -70,6 +71,10 @@ struct LinkedList<Element>: Container {
 }
 
 struct Queue<Element>: Container {
+	func top() -> Element? {
+		return elem.top()
+	}
+	
 	mutating func pop() -> Element? {
 		return elem.pop()
 	}
@@ -108,7 +113,10 @@ queue.push("One")
 queue.push("Two")
 queue.push("Three")
 queue.push("Four")
+print(list.top()!)
+print(queue.top()!)
 var size = queue.size() - 1
 for _ in 0...size {
 	print(queue.pop()!)
 }
+
