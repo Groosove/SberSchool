@@ -120,3 +120,7 @@ for _ in 0...size {
 	print(queue.pop()!)
 }
 
+
+while (true) {
+	
+}
