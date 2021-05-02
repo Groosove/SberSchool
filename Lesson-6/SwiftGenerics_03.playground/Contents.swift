@@ -9,10 +9,10 @@ indirect enum LinkedList<T> {
 let linkedList = LinkedList.next(value: 5, LinkedList.next(value: 10, LinkedList.next(value: 3, LinkedList.null(value: nil))))
 
 var iterateNode = linkedList
-while true {
+MainLoop: while true {
 	switch iterateNode {
 	case .null:
-		break
+		break MainLoop
 	case .next(let value, let next):
 		print(value)
 		iterateNode = next

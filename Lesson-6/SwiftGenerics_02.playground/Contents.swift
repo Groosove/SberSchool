@@ -22,10 +22,8 @@ struct LinkedList<Element>: Container {
 	
 	func size() -> Int { return count }
 	subscript(i: Int) -> Element? {
-		let index = (i < 0) ? count + i : i
-		
-		if var tmpNode = head, index < count {
-			for _ in 0..<index {
+		if var tmpNode = head, (0..<count).contains(i)  {
+			for _ in 0..<i {
 				tmpNode = tmpNode.next!
 			}
 			return tmpNode.value
@@ -63,9 +61,10 @@ struct LinkedList<Element>: Container {
 	func listOut() {
 		if var tmpNode = head {
 			for _ in 0..<count {
-				print(tmpNode.value)
+				print(tmpNode.value, terminator:" ")
 				tmpNode = tmpNode.next ?? tmpNode
 			}
+			print("")
 		}
 	}
 }
@@ -100,27 +99,22 @@ var list = LinkedList<Int>()
 list.push(3)
 list.push(5)
 list.push(8)
-print(list[-1] ?? "NULL")
-print(list[3] ?? "NULL")
-list.listOut()
-print(list.size())
+print("Check subscript")
+print(list[0] ?? "NULL")
+print(list[3] ?? "NULL\n")
+
+print("List value: ", terminator: ""); list.listOut()
+print("List size = \(list.size())")
 list.pushFront(10)
-list.listOut()
-print(list.size())
+print("List value: ", terminator: ""); list.listOut()
+print("List size = \(list.size())")
 
 var queue = Queue<String>()
 queue.push("One")
 queue.push("Two")
 queue.push("Three")
 queue.push("Four")
-print(list.top()!)
-print(queue.top()!)
-var size = queue.size() - 1
-for _ in 0...size {
-	print(queue.pop()!)
-}
+print("First element in list - \(list.top()!)")
+print("First element in queue - \(queue.top()!)")
 
-
-while (true) {
-	
-}
+for _ in 0..<queue.size() { print(queue.pop()!, terminator: " ") }
