@@ -3,6 +3,7 @@ import UIKit
 // MARK: - Задача 1 "Сделать так, чтобы закомментированный код работал"
 
 extension String: AdditiveArithmetic {
+	public static func -= (lhs: inout String, rhs: String) {}
 	public static func - (lhs: String, rhs: String) -> String { "0" }
 	public static var zero: String { return "0" }
 }
