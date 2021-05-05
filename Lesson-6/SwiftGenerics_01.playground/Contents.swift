@@ -2,13 +2,16 @@ import UIKit
 
 // MARK: - Задача 1 "Сделать так, чтобы закомментированный код работал"
 
-extension String: AdditiveArithmetic {
-	public static func -= (lhs: inout String, rhs: String) {}
-	public static func - (lhs: String, rhs: String) -> String { "0" }
-	public static var zero: String { return "0" }
+protocol AnyObjectArithmetic {
+	static func+ (lhs: Self, rhs: Self) -> Self
 }
 
-func sumTwoValues<T:AdditiveArithmetic>(_ a: T, _ b: T) -> T {
+extension Double: AnyObjectArithmetic {}
+extension String: AnyObjectArithmetic {}
+extension Int: AnyObjectArithmetic {}
+extension Float: AnyObjectArithmetic {}
+
+func sumTwoValues<T>(_ a: T, _ b: T) -> T where T: AnyObjectArithmetic {
 	let result = a + b
 	return result
 }
