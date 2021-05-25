@@ -10,8 +10,11 @@ import UIKit
 
 class ViewController: UITableViewController {
     private var placeLocation = ["New York", "Moscow", "Kazan", "Peter"]
+	
     override func viewDidLoad() {
         super.viewDidLoad()
+		tableView.delegate = self
+		tableView.dataSource = self
         tableView.register(CustomTableViewCell.self, forCellReuseIdentifier: CustomTableViewCell.identifier)
     }
 
@@ -22,10 +25,14 @@ class ViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CustomTableViewCell.identifier, for: indexPath) as! CustomTableViewCell
-        let place = self.placeLocation[indexPath.row]
-        cell.configure(place: place)
+		cell.configure(place: placeLocation[indexPath.row])
         return cell
     }
     
+	// MARK: - UITableViewDelegate
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		let secondVC = SecondViewController()
+		secondVC.title = placeLocation[indexPath.row]
+		navigationController?.pushViewController(secondVC, animated: true)
+	}
 }
-

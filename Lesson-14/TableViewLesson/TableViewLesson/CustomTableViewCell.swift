@@ -10,42 +10,58 @@ import UIKit
 
 class CustomTableViewCell: UITableViewCell {
     static let identifier = "CustomIdentifier"
-    private var placeLabel: UILabel = {
+	var isComplete = false
+	
+	lazy var placeLabel: UILabel = {
         var label = UILabel()
+		label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private var completeButton: UIButton = {
-       var button = UIButton()
-        button.backgroundColor = .orange
+	lazy var completeButton: UIButton = {
+		var button = UIButton(type: .system)
+		button.setTitle("❎", for: .normal)
+		button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+		button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    
+	
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
+		contentView.backgroundColor = .gray
         contentView.addSubview(placeLabel)
         contentView.addSubview(completeButton)
-        completeButton.translatesAutoresizingMaskIntoConstraints = false
-        placeLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            completeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 2),
-            completeButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 2),
-            completeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -2),
-//            completeButton.leadingAnchor.constraint(equalTo: placeLabel.trailingAnchor, constant: -2),
-            placeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 2),
-            placeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 2),
-            completeButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 2),
-            completeButton.widthAnchor.constraint(equalToConstant: 10)
-        ])
-        
     }
     
-    func configure(place: String) {
+	override class var requiresConstraintBasedLayout: Bool {
+		  return true
+	  }
+	
+	override func updateConstraints() {
+		NSLayoutConstraint.activate([
+			completeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+			completeButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5),
+			completeButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+			placeLabel.topAnchor.constraint(equalTo: topAnchor),
+			placeLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+			placeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+			placeLabel.trailingAnchor.constraint(equalTo: completeButton.leadingAnchor),
+		])
+		super.updateConstraints()
+	}
+	
+	func configure(place: String) {
         placeLabel.text = place
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+	
+	@objc private func buttonTapped() {
+		isComplete = !isComplete
+		let buttonTitle = isComplete ? "✅" : "❎"
+		contentView.backgroundColor = isComplete ? .green : .gray
+		completeButton.setTitle(buttonTitle, for: .normal)
+	}
 }
