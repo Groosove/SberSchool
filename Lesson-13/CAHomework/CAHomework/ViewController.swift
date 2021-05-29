@@ -10,14 +10,6 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    lazy private var turnOnButton: UIButton = {
-        var button = UIButton()
-        button.setTitle("Start", for: .normal)
-        button.setTitleColor(.black, for: .normal)
-        button.titleLabel?.font = UIFont(name: "Helvetica Neue", size: 20)
-        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        return button
-    }()
     
     lazy private var kindergartenView: UIImageView = {
         let image = UIImageView(image: UIImage(named: "kindergarten"))
@@ -45,6 +37,9 @@ class ViewController: UIViewController {
     
     lazy private var babyView: UIImageView = {
         let image = UIImageView(image: UIImage(named: "Baby"))
+        
+        image.isUserInteractionEnabled = true
+        image.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(babyTapped)))
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
@@ -62,17 +57,18 @@ class ViewController: UIViewController {
         return image
     }()
     
-    lazy private var womanGirl: UIImageView = {
+    lazy private var womanView: UIImageView = {
         let image = UIImageView(image: UIImage(named: "Woman"))
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
     
     lazy private var grandMotherView: UIImageView = {
-        let image = UIImageView(image: UIImage(named: "grandPa"))
+        let image = UIImageView(image: UIImage(named: "GrandMother"))
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -81,11 +77,105 @@ class ViewController: UIViewController {
         view.addSubview(universityView)
         view.addSubview(houseView)
         view.addSubview(babyView)
+        view.addSubview(littleGirlView)
+        view.addSubview(girlView)
+        view.addSubview(womanView)
+        view.addSubview(grandMotherView)
+        
+        littleGirlView.isHidden = true
+        girlView.isHidden = true
+        womanView.isHidden = true
+        grandMotherView.isHidden = true
+        
+        createConstrains()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    @objc private func babyTapped() {
+        animateView(with: babyView,
+                    x: kindergartenView.center.x - babyView.frame.size.width / 2,
+                    y: kindergartenView.center.y,
+                    selector: #selector(littleGirlAnimate))
+    }
+    
+    @objc private func littleGirlAnimate() {
+        babyView.isHidden = true
+        littleGirlView.isHidden = false
+        littleGirlView.frame.origin.x = babyView.frame.origin.x
+        littleGirlView.frame.origin.y = babyView.frame.origin.y
+        animateScaleView(with: littleGirlView)
+        Timer.scheduledTimer(withTimeInterval: TimeInterval(1.0), repeats: false, block: {_ in
+            self.animateView(with: self.littleGirlView,
+                             x: self.schoolView.center.x - self.littleGirlView.frame.width / 2,
+                             y: self.schoolView.center.y,
+                             selector: #selector(self.girlAnimate))
+        })
+    }
+    
+    @objc private func girlAnimate() {
+        littleGirlView.isHidden = true
+        girlView.isHidden = false
+        girlView.frame.origin.x = littleGirlView.frame.origin.x
+        girlView.frame.origin.y = littleGirlView.frame.origin.y
+        animateScaleView(with: girlView)
+        Timer.scheduledTimer(withTimeInterval: TimeInterval(1.0), repeats: false, block: {_ in
+            self.animateView(with: self.girlView,
+                             x: self.universityView.center.x - self.girlView.frame.width / 2,
+                             y: self.universityView.center.y,
+                             selector: #selector(self.womanAnimate))
+        })
+    }
+    
+    @objc private func womanAnimate() {
+        girlView.isHidden = true
+        womanView.isHidden = false
+        womanView.frame.origin.x = girlView.frame.origin.x
+        womanView.frame.origin.y = girlView.frame.origin.y
+        animateScaleView(with: womanView)
+        Timer.scheduledTimer(withTimeInterval: TimeInterval(1.0), repeats: false, block: {_ in
+            self.animateView(with: self.womanView,
+                             x: self.houseView.center.x - self.womanView.frame.width / 2,
+                             y: self.houseView.center.y,
+                             selector: #selector(self.grandMomAnimate))
+        })
         
+    }
+    
+    @objc private func grandMomAnimate() {
+        womanView.isHidden = true
+        grandMotherView.isHidden = false
+        grandMotherView.frame.origin.x = womanView.frame.origin.x
+        grandMotherView.frame.origin.y = womanView.frame.origin.y
+        animateScaleView(with: grandMotherView)
+    }
+    
+    @objc private func animateView(with view: UIView, x: CGFloat, y: CGFloat, selector: Selector) {
+        let animate = CABasicAnimation(keyPath: "transform.scale")
+        animate.fromValue = 1
+        animate.toValue = 0.2
+        animate.duration = 5.0
+        view.layer.add(animate, forKey: "scale")
+        UIView.animateKeyframes(withDuration: 5,
+                                delay: 0,
+                                options: [],
+                                animations: {
+                                    UIView.addKeyframe(withRelativeStartTime: 0.0,
+                                                       relativeDuration: 5.0, animations: {
+                                                        view.frame.origin.x = x
+                                                        view.frame.origin.y = y
+                                    })
+        })
+        Timer.scheduledTimer(timeInterval: TimeInterval(5.0), target: self, selector: selector, userInfo: nil, repeats: false)
+    }
+    
+    @objc private func animateScaleView(with view: UIView) {
+        let animate = CABasicAnimation(keyPath: "transform.scale")
+        animate.fromValue = 0
+        animate.toValue = 1
+        animate.duration = 1.0
+        view.layer.add(animate, forKey: "scale")
+    }
+    
+    func createConstrains() {
         NSLayoutConstraint.activate([
             babyView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -10),
             babyView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10),
@@ -111,15 +201,20 @@ class ViewController: UIViewController {
             houseView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             houseView.widthAnchor.constraint(equalToConstant: houseView.frame.width),
             houseView.heightAnchor.constraint(equalToConstant: houseView.frame.height),
+            
+            littleGirlView.centerXAnchor.constraint(equalTo: kindergartenView.centerXAnchor),
+            littleGirlView.widthAnchor.constraint(equalToConstant: littleGirlView.frame.width),
+            littleGirlView.heightAnchor.constraint(equalToConstant: littleGirlView.frame.height),
+            
+            girlView.widthAnchor.constraint(equalToConstant: girlView.frame.width),
+            girlView.heightAnchor.constraint(equalToConstant: girlView.frame.height),
+            
+            womanView.widthAnchor.constraint(equalToConstant: womanView.frame.width),
+            womanView.heightAnchor.constraint(equalToConstant: womanView.frame.height),
+            
+            grandMotherView.widthAnchor.constraint(equalToConstant: grandMotherView.frame.width),
+            grandMotherView.heightAnchor.constraint(equalToConstant: grandMotherView.frame.height),
         ])
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-    }
-    
-    @objc private func buttonTapped() {
-        
     }
 }
 
