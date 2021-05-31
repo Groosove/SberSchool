@@ -69,6 +69,15 @@ class ViewController: UIViewController {
         return image
     }()
     
+    lazy private var sunView: UIImageView = {
+        let image = UIImageView(image: UIImage(named: "sun"))
+        image.translatesAutoresizingMaskIntoConstraints = false
+        return image
+    }()
+    
+    let initialX: CGFloat = 40
+    let imageViewWidth: CGFloat = 60
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
@@ -81,16 +90,33 @@ class ViewController: UIViewController {
         view.addSubview(girlView)
         view.addSubview(womanView)
         view.addSubview(grandMotherView)
-        
+        view.addSubview(sunView)
         littleGirlView.isHidden = true
         girlView.isHidden = true
         womanView.isHidden = true
         grandMotherView.isHidden = true
+        sunView.isHidden = true
         
         createConstrains()
     }
     
     @objc private func babyTapped() {
+        let circularPathSun = UIBezierPath(arcCenter: view.center,
+                                        radius: view.frame.width,
+                                        startAngle: -.pi,
+                                        endAngle: 0,
+                                        clockwise: true)
+        
+        let animationSun = CAKeyframeAnimation(keyPath: #keyPath(CALayer.position))
+        animationSun.duration = 3
+        animationSun.repeatCount = 10
+        animationSun.path = circularPathSun.cgPath
+        animationSun.timingFunction = CAMediaTimingFunction(name: .default)
+        sunView.layer.add(animationSun, forKey: "myAnimation")
+        
+        sunView.frame.origin.x = circularPathSun.cgPath.currentPoint.x - sunView.frame.width / 2
+        sunView.frame.origin.y = circularPathSun.cgPath.currentPoint.y - sunView.frame.height / 2
+        
         animateView(with: babyView,
                     x: kindergartenView.center.x - babyView.frame.size.width / 2,
                     y: kindergartenView.center.y,
@@ -216,5 +242,21 @@ class ViewController: UIViewController {
             grandMotherView.heightAnchor.constraint(equalToConstant: grandMotherView.frame.height),
         ])
     }
+    
+    func pauseLayer(layer: CALayer) {
+        let pausedTime: CFTimeInterval = layer.convertTime(CACurrentMediaTime(), from: nil)
+        layer.speed = 0.0
+        layer.timeOffset = pausedTime
+    }
+
+    func resumeLayer(layer: CALayer) {
+        let pausedTime: CFTimeInterval = layer.timeOffset
+        layer.speed = 1.0
+        layer.timeOffset = 0.0
+        layer.beginTime = 0.0
+        let timeSincePause: CFTimeInterval = layer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
+        layer.beginTime = timeSincePause
+    }
+    
 }
 
