@@ -12,6 +12,6 @@ enum Key {
     }
     
     enum WeaterMethod {
-        static let getCountry = "api.openweathermap.org/data/2.5/weather"
+        static let getCountry = "http://api.openweathermap.org/data/2.5/weather"
     }
 }

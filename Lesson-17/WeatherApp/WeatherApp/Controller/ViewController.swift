@@ -10,7 +10,7 @@ import UIKit
 
 class ViewController: BaseViewController {
     private let networkService: WeatherNetworkProtocol
-    private var dataSource = [CurrentWeatherData]()
+    private var dataSource = [WeatherData]()
     
     init(networkService: WeatherNetworkProtocol) {
         self.networkService = networkService
@@ -25,7 +25,7 @@ class ViewController: BaseViewController {
         let tableView = UITableView()
         tableView.register(WeatherCell.self, forCellReuseIdentifier: WeatherCell.indentifirer)
         tableView.dataSource = self
-//        tableView.delegate = self
+        tableView.delegate = self
         tableView.showsVerticalScrollIndicator = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
@@ -35,7 +35,7 @@ class ViewController: BaseViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         configureUI()
-        loadData()
+        setNavigationBar()
     }
     
     private func configureUI() {
@@ -48,9 +48,9 @@ class ViewController: BaseViewController {
         ])
     }
 
-    private func loadData() {
+    private func loadData(with city: String) {
         isLoading = true
-        networkService.getCountry(with: "UFA") {
+        networkService.getCountry(with: city) {
             self.process($0)
         }
     }
@@ -61,13 +61,42 @@ class ViewController: BaseViewController {
              case .success(let data):
                 self.dataSource.append(data)
                 self.tableView.reloadData()
-                
-             case .failure(let _):
+             case .failure:
                 print(#function)
              }
+            
              self.isLoading = false
          }
      }
+    
+    private func getFahrenheit(valueInKelvin: Double) -> Double {
+        return ((valueInKelvin - 273.15) * 1.8) + 32
+    }
+     
+  
+    
+    private func setNavigationBar() {
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.add, target: self, action: #selector(addCity))
+    }
+    
+    @objc private func addCity() {
+        createAlert()
+    }
+    
+    private func createAlert() {
+        let alert = UIAlertController(title: "City", message: "Enter a city name", preferredStyle: .alert)
+        var result: String?
+        alert.addTextField { textField in
+            textField.placeholder = "City name..."
+        }
+
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
+            let textField = alert?.textFields![0]
+            result = textField?.text
+            self.loadData(with: result ?? "beleberda")
+        }))
+        self.present(alert, animated: true, completion: nil)
+    }
 }
 
 
@@ -79,23 +108,16 @@ extension ViewController: UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: WeatherCell.indentifirer,
-                                                 for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: WeatherCell.indentifirer, for: indexPath)
         (cell as? WeatherCell)?.configure(with: dataSource[indexPath.row])
         return cell
     }
 }
 
-//extension ViewController: UITableViewDelegate {
-//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        if indexPath.row == dataSource.count - 1, !isLoading {
-//            isLoading = true
-//            networkService.getGames(after: cursor) { self.process($0) }
-//        }
-//    }
-//
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        tableView.deselectRow(at: indexPath, animated: true)
-//        navigationController?.present(viewController, animated: true, completion: nil)
-//    }
-//}
+extension ViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let viewController = CityInfoViewController(data: dataSource[indexPath.row])
+        tableView.deselectRow(at: indexPath, animated: true)
+        navigationController?.present(viewController, animated: true, completion: nil)
+    }
+}

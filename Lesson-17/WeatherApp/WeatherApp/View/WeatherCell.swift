@@ -11,7 +11,7 @@ import UIKit
 final class WeatherCell: UITableViewCell {
     static let indentifirer = "WeatherCell"
     
-    func configure(with model: CurrentWeatherData) {
-        textLabel?.text = model.cityName
+    func configure(with model: WeatherData) {
+        textLabel?.text = model.name
     }
 }
